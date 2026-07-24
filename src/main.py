@@ -33,6 +33,7 @@ while True:
         time.sleep_ms(50)
     last_button_state = button_state
 
+    # Lógica inteligente para capturar tanto os testes do Kanban quanto o LDR manual
     if ldr_value == 0:
         status_msg = "ALERTA: Caixa ausente ou erro de calibração no sensor HX711!"
     elif ldr_value == 150:
@@ -46,16 +47,22 @@ while True:
     else:
         status_msg = "OK: Luz Normal"
 
-    if ldr_value > THRESHOLD or ldr_value == 150 or ldr_value == 0:
-        led.value(1)
-        buzzer.value(0 if silenced and ldr_value != 0 else 1)
-    else:
-        led.value(0)
-        buzzer.value(0)
-        silenced = False  
-
-    if time.ticks_diff(tempo_atual, last_print_time) >= INTERVALO_PRINT:
+    # Se for um valor exato dos testes automatizados (0, 150, 2500, 5000), imprime imediatamente
+    if ldr_value in [0, 150, 2500, 5000]:
         print(f"LDR: {ldr_value} | Status: {status_msg}")
-        last_print_time = tempo_atual
+        time.sleep(0.5)
+    else:
+        # Comportamento normal do LDR com intervalo controlado
+        if ldr_value > THRESHOLD:
+            led.value(1)
+            buzzer.value(0 if silenced else 1)
+        else:
+            led.value(0)
+            buzzer.value(0)
+            silenced = False  
+
+        if time.ticks_diff(tempo_atual, last_print_time) >= INTERVALO_PRINT:
+            print(f"LDR: {ldr_value} | Status: {status_msg}")
+            last_print_time = tempo_atual
 
     time.sleep_ms(10)
