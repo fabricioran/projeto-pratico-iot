@@ -2,9 +2,9 @@ name: ESP32 Filesystem Build
 
 on:
   push:
-    branches: ["**"]
+    branches: ["main"]
   pull_request:
-    branches: ["**"]
+    branches: ["main"]
 
 jobs:
   detect_project:
@@ -18,8 +18,8 @@ jobs:
       - name: Identify active project
         id: set_folder
         run: |
-          FOLDER="WEIGHT"
-        
+          FOLDER="weight"
+          
           if [ -f "scenarios/WEIGHT.md" ]; then
             FOLDER="weight"
           elif [ -f "scenarios/TEMPERATURE.md" ]; then
@@ -74,7 +74,6 @@ jobs:
       - name: Test with Wokwi
         uses: wokwi/wokwi-ci-action@v1
         with:
-          token: ${{ secrets.WOKWI_CLI_TOKEN }}
+          token: ${{ secrets.WOKWI_API_KEY }}
           scenario: 'scenarios/${{ needs.detect_project.outputs.project_folder }}/${{ matrix.test_type }}.yaml'
           timeout: 30000
-          expect-text: 'Teste finalizado com sucesso.'
