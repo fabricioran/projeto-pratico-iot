@@ -74,6 +74,6 @@ jobs:
       - name: Test with Wokwi
         uses: wokwi/wokwi-ci-action@v1
         with:
-          token: ${{ secrets.WOKWI_API_KEY }}
+          token: ${{ secrets.WOKWI_CLI_TOKEN }}
           scenario: 'scenarios/${{ needs.detect_project.outputs.project_folder }}/${{ matrix.test_type }}.yaml'
           timeout: 30000
