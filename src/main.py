@@ -20,8 +20,8 @@ silenced = False
 last_button_state = 1
 last_print_time = 0
 
-# Correção: rodar apenas 20 ciclos (ou ajuste conforme necessário)
-for _ in range(20):
+# Correção: limitar a execução para 30 ciclos
+for _ in range(30):
     tempo_atual = time.ticks_ms()
     
     ldr_value = ldr.read()
@@ -47,3 +47,5 @@ for _ in range(20):
         last_print_time = tempo_atual
 
     time.sleep_ms(10)
+
+print("Teste finalizado com sucesso.")
