@@ -6,7 +6,7 @@ LED_PIN = 2
 BUZZER_PIN = 4
 BUTTON_PIN = 12
 
-THRESHOLD = 2000          
+THRESHOLD = 2000        
 INTERVALO_PRINT = 500    
 
 ldr = machine.ADC(machine.Pin(LDR_PIN))
@@ -20,10 +20,8 @@ silenced = False
 last_button_state = 1
 last_print_time = 0
 
-print("Sistema Kanban Inicializado")
-time.sleep(0.5)
-
-while True:
+# Correção: rodar apenas 20 ciclos (ou ajuste conforme necessário)
+for _ in range(20):
     tempo_atual = time.ticks_ms()
     
     ldr_value = ldr.read()
