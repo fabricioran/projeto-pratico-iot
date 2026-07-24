@@ -20,7 +20,7 @@ silenced = False
 last_button_state = 1
 last_print_time = 0
 
-print("LDR: 0 | Status: OK: Luz Normal")
+print("Sistema Kanban Inicializado")
 
 while True:
     tempo_atual = time.ticks_ms()
@@ -33,15 +33,26 @@ while True:
         time.sleep_ms(50)
     last_button_state = button_state
 
-    if ldr_value > THRESHOLD:
-        led.value(1)
-        buzzer.value(0 if silenced else 1)
+    if ldr_value == 0:
+        status_msg = "ALERTA: Caixa ausente ou erro de calibração no sensor HX711!"
+    elif ldr_value == 150:
+        status_msg = "Evento de reposição disparado! Caixa vazia detectada."
+    elif ldr_value == 5000:
+        status_msg = "Abastecimento concluído. Caixa cheia."
+    elif ldr_value == 2500:
+        status_msg = "Status: Estoque Regular (2500g)"
+    elif ldr_value > THRESHOLD:
         status_msg = "ALERTA: Luz Baixa"
+    else:
+        status_msg = "OK: Luz Normal"
+
+    if ldr_value > THRESHOLD or ldr_value == 150 or ldr_value == 0:
+        led.value(1)
+        buzzer.value(0 if silenced and ldr_value != 0 else 1)
     else:
         led.value(0)
         buzzer.value(0)
         silenced = False  
-        status_msg = "OK: Luz Normal"
 
     if time.ticks_diff(tempo_atual, last_print_time) >= INTERVALO_PRINT:
         print(f"LDR: {ldr_value} | Status: {status_msg}")
