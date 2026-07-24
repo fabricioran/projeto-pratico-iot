@@ -1,3 +1,59 @@
+name: ESP32 Filesystem Build
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  detect_project:
+    runs-on: ubuntu-latest
+    outputs:
+      project_folder: ${{ steps.set_folder.outputs.project_folder }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Identify active project
+        id: set_folder
+        run: |
+          FOLDER="WEIGHT"
+        
+          if [ -f "scenarios/WEIGHT.md" ]; then
+            FOLDER="weight"
+          elif [ -f "scenarios/TEMPERATURE.md" ]; then
+            FOLDER="temperature"
+          elif [ -f "scenarios/LIGHT.md" ]; then
+            FOLDER="light"
+          fi
+          
+          echo "project_folder=$FOLDER" >> $GITHUB_OUTPUT
+          echo "Projeto ativo detectado: $FOLDER"
+
+  build_filesystem:
+    needs: detect_project
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t esp32-builder -f Dockerfile .
+
+      - name: Run container and generate fs.bin
+        run: |
+          docker run --name esp32-fs-builder esp32-builder /bin/bash
+          docker cp esp32-fs-builder:/fs.bin .
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: esp32-firmware-binary
+          path: fs.bin
+          retention-days: 1
+
   run_tests:
     needs: [detect_project, build_filesystem]
     runs-on: ubuntu-latest
