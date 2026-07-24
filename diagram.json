@@ -1,13 +1,57 @@
 {
   "version": 1,
-  "author": "Uri Shaked",
+  "author": "Fabricio Melo",
   "editor": "wokwi",
   "parts": [
-    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": 0, "left": 0, "attrs": {} },
-    { "type": "chip-hx711", "id": "hx711", "top": -50, "left": 100, "attrs": {} }
+    {
+      "type": "board-esp32-devkit-c-v4",
+      "id": "esp",
+      "top": 48,
+      "left": 33.64,
+      "attrs": { "env": "micropython-20260406-v1.28.0" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led1",
+      "top": 82.8,
+      "left": -53.4,
+      "attrs": { "color": "red", "flip": "1" }
+    },
+    {
+      "type": "wokwi-buzzer",
+      "id": "bz1",
+      "top": 31.2,
+      "left": 213,
+      "attrs": { "volume": "0.1" }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn1",
+      "top": 166.6,
+      "left": -153.4,
+      "rotate": 270,
+      "attrs": { "color": "green", "xray": "1" }
+    },
+    {
+      "type": "wokwi-photoresistor-sensor",
+      "id": "ldr1",
+      "top": -35.2,
+      "left": -172,
+      "attrs": {}
+    }
   ],
   "connections": [
     [ "esp:TX", "$serialMonitor:RX", "", [] ],
-    [ "esp:RX", "$serialMonitor:TX", "", [] ]
-  ]
+    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+    [ "esp:3V3", "ldr1:VCC", "red", [ "h-19.05", "v-57.6", "v-38.4" ] ],
+    [ "ldr1:GND", "esp:GND.2", "black", [ "h134.4", "v38" ] ],
+    [ "ldr1:AO", "esp:VP", "green", [ "v28.1", "v57.6" ] ],
+    [ "led1:A", "esp:D2", "red", [ "v96", "h57.6" ] ],
+    [ "led1:C", "esp:GND.1", "black", [ "v0" ] ],
+    [ "bz1:2", "esp:4", "red", [ "v76.8", "h-115.6" ] ],
+    [ "bz1:1", "esp:GND.3", "black", [ "v0" ] ],
+    [ "btn1:1.l", "esp:D2", "green", [ "v15.9", "h150.1", "v-19.2" ] ],
+    [ "btn1:2.l", "esp:GND.1", "green", [ "v6.3", "h121.5", "v-28.8" ] ]
+  ],
+  "dependencies": {}
 }
