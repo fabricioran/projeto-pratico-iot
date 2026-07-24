@@ -1,21 +1,51 @@
+import machine
 import time
 
-# Imprime a inicialização exigida por todos os testes
+LDR_PIN = 36
+LED_PIN = 2
+BUZZER_PIN = 4
+BUTTON_PIN = 12
+
+THRESHOLD = 2000          
+INTERVALO_PRINT = 500    
+
+ldr = machine.ADC(machine.Pin(LDR_PIN))
+ldr.atten(machine.ADC.ATTN_11DB)
+
+led = machine.Pin(LED_PIN, machine.Pin.OUT)
+buzzer = machine.Pin(BUZZER_PIN, machine.Pin.OUT)
+button = machine.Pin(BUTTON_PIN, machine.Pin.IN, machine.Pin.PULL_UP)
+
+silenced = False
+last_button_state = 1
+last_print_time = 0
+
 print("Sistema Kanban Inicializado")
-time.sleep(1.0)
-
-# Simula o fluxo e garante que o último print do test_3 apareça a tempo
-print("LDR: 2500 | Status: Status: Estoque Regular (2500g)")
-time.sleep(1.0)
-
-print("LDR: 150 | Status: Evento de reposição disparado! Caixa vazia detectada.")
-time.sleep(1.0)
-
-print("LDR: 5000 | Status: Abastecimento concluído. Caixa cheia.")
-time.sleep(1.0)
-
-# Mensagem exata esperada pelo teste de anomalia (test_3)
-print("LDR: 0 | Status: ALERTA: Caixa ausente ou erro de calibração no sensor HX711!")
+time.sleep(0.5)
 
 while True:
-    time.sleep(1)
+    tempo_atual = time.ticks_ms()
+    
+    ldr_value = ldr.read()
+    button_state = button.value()
+
+    if last_button_state == 1 and button_state == 0:
+        silenced = True
+        time.sleep_ms(50)
+    last_button_state = button_state
+
+    if ldr_value > THRESHOLD:
+        led.value(1)
+        buzzer.value(0 if silenced else 1)
+        status_msg = "ALERTA: Luz Baixa"
+    else:
+        led.value(0)
+        buzzer.value(0)
+        silenced = False  
+        status_msg = "OK: Luz Normal"
+
+    if time.ticks_diff(tempo_atual, last_print_time) >= INTERVALO_PRINT:
+        print(f"LDR: {ldr_value} | Status: {status_msg}")
+        last_print_time = tempo_atual
+
+    time.sleep_ms(10)
